@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BlindSpot — New Environment</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    background: #f4f5f7;
+    color: #1f2430;
+  }
+
+  header {
+    background: #14161f;
+    color: #fff;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  header .logo { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+  header .logo span { color: #6c8cff; }
+
+  header nav a {
+    color: #b7bcd0;
+    text-decoration: none;
+    margin-left: 24px;
+    font-size: 14px;
+  }
+  header nav a.active { color: #fff; font-weight: 600; }
+
+  main {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 32px;
+  }
+
+  .page-title { margin-bottom: 4px; }
+  .page-title h1 { font-size: 22px; }
+
+  .breadcrumb { font-size: 13px; color: #9099ac; margin-bottom: 4px; }
+  .breadcrumb a { color: #9099ac; text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  .subtitle { color: #6b7280; font-size: 13px; margin-bottom: 28px; }
+
+  .panel {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 28px;
+  }
+
+  .field { margin-bottom: 20px; }
+  .field:last-of-type { margin-bottom: 0; }
+
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .field .hint {
+    font-size: 12px;
+    color: #9099ac;
+    margin-top: 6px;
+  }
+
+  .field input[type="text"],
+  .field input[type="url"],
+  .field input[type="password"],
+  .field select {
+    width: 100%;
+    font-size: 13px;
+    font-family: inherit;
+    padding: 10px 12px;
+    border: 1px solid #d7dae0;
+    border-radius: 6px;
+    background: #fff;
+    color: #1f2430;
+  }
+
+  .field input:focus,
+  .field select:focus {
+    outline: none;
+    border-color: #4c6fff;
+    box-shadow: 0 0 0 3px rgba(76, 111, 255, 0.12);
+  }
+
+  .type-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .type-option {
+    position: relative;
+  }
+
+  .type-option input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .type-option .box {
+    border: 1px solid #d7dae0;
+    border-radius: 6px;
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+  }
+
+  .type-option .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 0 auto 6px;
+  }
+  .dot.prod { background: #d63b3b; }
+  .dot.staging { background: #e0a12b; }
+  .dot.preview { background: #4c6fff; }
+  .dot.dev { background: #8b93a7; }
+
+  .type-option input:checked + .box {
+    border-color: #4c6fff;
+    background: #eef1ff;
+    color: #4c6fff;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  .btn {
+    background: #4c6fff;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .btn-secondary {
+    background: #fff;
+    color: #4c6fff;
+    border: 1px solid #d7dae0;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-secondary:hover { border-color: #4c6fff; }
+
+  .section-divider {
+    border: none;
+    border-top: 1px solid #f0f1f3;
+    margin: 24px 0;
+  }
+
+  .section-label {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+
+  .section-hint {
+    font-size: 12px;
+    color: #9099ac;
+    margin-bottom: 16px;
+  }
+
+  .new-profile-fields {
+    margin-top: 16px;
+    padding: 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+  }
+
+  .new-profile-fields .field:last-child { margin-bottom: 0; }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Blind<span>Spot</span></div>
+  <nav>
+    <a href="index.html">Environments</a>
+  </nav>
+</header>
+
+<main>
+
+  <div class="page-title">
+    <div class="breadcrumb"><a href="index.html">Acme Corp</a> / New Environment</div>
+    <h1>Add Environment</h1>
+  </div>
+  <p class="subtitle">Register a new environment for BlindSpot to monitor and run tests against.</p>
+
+  <form class="panel" onsubmit="window.location.href='index.html'; return false;">
+
+    <div class="field">
+      <label for="env-name">Environment name</label>
+      <input type="text" id="env-name" name="env-name" placeholder="e.g. QA, Canary, Demo" required>
+    </div>
+
+    <div class="field">
+      <label for="env-url">Base URL</label>
+      <input type="url" id="env-url" name="env-url" placeholder="https://qa.acme.com" required>
+      <div class="hint">The root URL BlindSpot will use to reach this environment.</div>
+    </div>
+
+    <div class="field">
+      <label>Environment type</label>
+      <div class="type-options">
+        <label class="type-option">
+          <input type="radio" name="env-type" value="prod" checked>
+          <span class="box"><span class="dot prod"></span>Prod</span>
+        </label>
+        <label class="type-option">
+          <input type="radio" name="env-type" value="staging">
+          <span class="box"><span class="dot staging"></span>Staging</span>
+        </label>
+        <label class="type-option">
+          <input type="radio" name="env-type" value="preview">
+          <span class="box"><span class="dot preview"></span>Preview</span>
+        </label>
+        <label class="type-option">
+          <input type="radio" name="env-type" value="dev">
+          <span class="box"><span class="dot dev"></span>Dev</span>
+        </label>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="section-label">Authentication</div>
+    <div class="section-hint">The credentials BlindSpot's bot will log in with when running tests against this environment.</div>
+
+    <div class="field">
+      <label for="auth-profile">Auth profile</label>
+      <select id="auth-profile" name="auth-profile" onchange="toggleNewProfileFields(this.value)">
+        <option value="none">No authentication (public pages only)</option>
+        <option value="standard-test-user">Standard Test User</option>
+        <option value="admin-user">Admin User</option>
+        <option value="new">+ Create new profile</option>
+      </select>
+      <div class="hint">Profiles are shared across environments for this client and stored encrypted.</div>
+    </div>
+
+    <div class="new-profile-fields" id="new-profile-fields" style="display: none;">
+
+      <div class="field">
+        <label for="profile-name">Profile name</label>
+        <input type="text" id="profile-name" name="profile-name" placeholder="e.g. Standard Test User">
+      </div>
+
+      <div class="field">
+        <label for="login-url">Login URL</label>
+        <input type="url" id="login-url" name="login-url" placeholder="https://qa.acme.com/login">
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="auth-username">Username / email</label>
+          <input type="text" id="auth-username" name="auth-username" placeholder="qa-bot@acme.com">
+        </div>
+        <div class="field">
+          <label for="auth-password">Password</label>
+          <input type="password" id="auth-password" name="auth-password" placeholder="••••••••">
+        </div>
+      </div>
+
+      <div class="hint">This account should be a dedicated test user with the access level you want the bot to exercise — not a real employee's credentials.</div>
+
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="section-label">VPN / Network Access</div>
+    <div class="section-hint">If this environment is only reachable over VPN, select the tunnel BlindSpot's bot should connect through before running tests.</div>
+
+    <div class="field">
+      <label for="vpn-config">VPN config</label>
+      <select id="vpn-config" name="vpn-config" onchange="toggleNewVpnFields(this.value)">
+        <option value="none">No VPN (publicly reachable)</option>
+        <option value="acme-corporate-vpn">Acme Corporate VPN</option>
+        <option value="staging-tunnel">Staging VPN Tunnel</option>
+        <option value="new">+ Create new VPN config</option>
+      </select>
+      <div class="hint">Configs are shared across environments for this client and stored encrypted.</div>
+    </div>
+
+    <div class="new-profile-fields" id="new-vpn-fields" style="display: none;">
+
+      <div class="field">
+        <label for="vpn-name">Config name</label>
+        <input type="text" id="vpn-name" name="vpn-name" placeholder="e.g. Staging VPN Tunnel">
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="vpn-type">VPN type</label>
+          <select id="vpn-type" name="vpn-type">
+            <option value="wireguard">WireGuard</option>
+            <option value="openvpn">OpenVPN</option>
+            <option value="ipsec">IPsec / L2TP</option>
+            <option value="anyconnect">Cisco AnyConnect</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="vpn-server">Server address</label>
+          <input type="text" id="vpn-server" name="vpn-server" placeholder="vpn.acme.com:1194">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="vpn-username">Username</label>
+          <input type="text" id="vpn-username" name="vpn-username" placeholder="qa-bot">
+        </div>
+        <div class="field">
+          <label for="vpn-password">Password / pre-shared key</label>
+          <input type="password" id="vpn-password" name="vpn-password" placeholder="••••••••">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="vpn-config-file">Config / certificate file</label>
+        <input type="file" id="vpn-config-file" name="vpn-config-file">
+        <div class="hint">Upload the .ovpn, .conf, or client certificate bundle for this tunnel, if required.</div>
+      </div>
+
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="actions">
+      <a href="index.html" class="btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center;">Cancel</a>
+      <button type="submit" class="btn">Create Environment</button>
+    </div>
+
+  </form>
+
+  <script>
+    function toggleNewProfileFields(value) {
+      document.getElementById('new-profile-fields').style.display = value === 'new' ? 'block' : 'none';
+    }
+    function toggleNewVpnFields(value) {
+      document.getElementById('new-vpn-fields').style.display = value === 'new' ? 'block' : 'none';
+    }
+  </script>
+
+</main>
+
+</body>
+</html>
