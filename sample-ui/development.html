@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BlindSpot — Development Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    background: #f4f5f7;
+    color: #1f2430;
+  }
+
+  header {
+    background: #14161f;
+    color: #fff;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  header .logo { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+  header .logo span { color: #6c8cff; }
+
+  header nav a {
+    color: #b7bcd0;
+    text-decoration: none;
+    margin-left: 24px;
+    font-size: 14px;
+  }
+  header nav a.active { color: #fff; font-weight: 600; }
+
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px;
+  }
+
+  .page-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 24px;
+  }
+
+  .page-title h1 { font-size: 22px; }
+  .page-title p { color: #6b7280; font-size: 13px; margin-top: 4px; }
+  .breadcrumb { font-size: 13px; color: #9099ac; margin-bottom: 4px; }
+  .breadcrumb a { color: #9099ac; text-decoration: none; }
+
+  .btn {
+    background: #4c6fff;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+
+  .card .label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+  .card .value { font-size: 26px; font-weight: 700; margin-top: 6px; color: #9099ac; }
+
+  .empty-panel {
+    background: #fff;
+    border: 1px dashed #d7dae0;
+    border-radius: 8px;
+    padding: 60px 20px;
+    text-align: center;
+  }
+
+  .empty-panel .icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #f0f1f3;
+    color: #9099ac;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+
+  .empty-panel h2 {
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+
+  .empty-panel p {
+    font-size: 13px;
+    color: #6b7280;
+    max-width: 380px;
+    margin: 0 auto 20px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Blind<span>Spot</span></div>
+  <nav>
+    <a href="index.html">Environments</a>
+    <a href="#" class="active">Dashboard</a>
+    <a href="#">Tests</a>
+    <a href="#">Runs</a>
+    <a href="#">Reports</a>
+    <a href="#">Settings</a>
+  </nav>
+</header>
+
+<main>
+
+  <div class="page-title">
+    <div>
+      <div class="breadcrumb"><a href="index.html">Acme Corp</a> / Development</div>
+      <h1>Acme Corp — Development</h1>
+      <p>http://localhost:3000</p>
+    </div>
+    <button class="btn">Run New Test</button>
+  </div>
+
+  <div class="stats">
+    <div class="card">
+      <div class="label">Tests</div>
+      <div class="value">20</div>
+    </div>
+    <div class="card">
+      <div class="label">Passing</div>
+      <div class="value">—</div>
+    </div>
+    <div class="card">
+      <div class="label">Failing</div>
+      <div class="value">—</div>
+    </div>
+    <div class="card">
+      <div class="label">Pass Rate</div>
+      <div class="value">—</div>
+    </div>
+  </div>
+
+  <div class="empty-panel">
+    <div class="icon">＋</div>
+    <h2>No runs yet on Development</h2>
+    <p>
+      20 tests are configured for this environment but none have been executed here.
+      Development environments are typically local and not reachable by BlindSpot workers
+      automatically — trigger a manual run once your dev server is up.
+    </p>
+    <button class="btn">Run All Tests</button>
+  </div>
+
+</main>
+
+</body>
+</html>

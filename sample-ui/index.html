@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BlindSpot — Environments</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    background: #f4f5f7;
+    color: #1f2430;
+  }
+
+  header {
+    background: #14161f;
+    color: #fff;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  header .logo { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+  header .logo span { color: #6c8cff; }
+
+  header nav a {
+    color: #b7bcd0;
+    text-decoration: none;
+    margin-left: 24px;
+    font-size: 14px;
+  }
+  header nav a.active { color: #fff; font-weight: 600; }
+
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px;
+  }
+
+  .page-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .page-title h1 { font-size: 22px; }
+
+  .breadcrumb { font-size: 13px; color: #9099ac; margin-bottom: 4px; }
+  .breadcrumb a { color: #9099ac; text-decoration: none; }
+
+  .subtitle { color: #6b7280; font-size: 13px; margin-bottom: 28px; }
+
+  .btn {
+    background: #4c6fff;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Client-level summary strip */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+
+  .card .label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+  .card .value { font-size: 26px; font-weight: 700; margin-top: 6px; }
+  .card .value.pass { color: #1a9e5c; }
+  .card .value.fail { color: #d63b3b; }
+
+  /* Environment cards */
+  .env-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .env-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .env-card.disabled { opacity: 0.55; }
+
+  .env-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .env-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .env-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+  }
+  .env-dot.prod { background: #d63b3b; }
+  .env-dot.staging { background: #e0a12b; }
+  .env-dot.preview { background: #4c6fff; }
+  .env-dot.dev { background: #8b93a7; }
+
+  .env-name { font-size: 16px; font-weight: 700; }
+  .env-url { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+  .env-tag {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .env-tag.prod { background: #fdecec; color: #d63b3b; }
+  .env-tag.staging { background: #fdf3e2; color: #b9791b; }
+  .env-tag.preview { background: #eef1ff; color: #4c6fff; }
+  .env-tag.dev { background: #f0f1f3; color: #6b7280; }
+
+  .env-metrics {
+    display: flex;
+    gap: 20px;
+  }
+
+  .env-metric .num { font-size: 20px; font-weight: 700; }
+  .env-metric .lbl { font-size: 11px; color: #9099ac; text-transform: uppercase; }
+  .env-metric .num.pass { color: #1a9e5c; }
+  .env-metric .num.fail { color: #d63b3b; }
+
+  .env-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f0f1f3;
+    padding-top: 12px;
+    font-size: 12px;
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .status.passed { background: #e6f7ee; color: #1a9e5c; }
+  .status.failed { background: #fdecec; color: #d63b3b; }
+  .status.running { background: #eef1ff; color: #4c6fff; }
+  .status.idle { background: #f0f1f3; color: #6b7280; }
+
+  .env-link {
+    color: #4c6fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .env-link:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Blind<span>Spot</span></div>
+  <nav>
+    <a href="#" class="active">Environments</a>
+    <a href="#">Tests</a>
+    <a href="#">Reports</a>
+    <a href="#">Settings</a>
+  </nav>
+</header>
+
+<main>
+
+  <div class="page-title">
+    <div>
+      <div class="breadcrumb"><a href="#">Clients</a> / Acme Corp</div>
+      <h1>Acme Corp — Environments</h1>
+    </div>
+    <button class="btn">Add Environment</button>
+  </div>
+  <p class="subtitle">All staged environments monitored for this client. Select an environment to view its test dashboard.</p>
+
+  <div class="stats">
+    <div class="card">
+      <div class="label">Environments</div>
+      <div class="value">4</div>
+    </div>
+    <div class="card">
+      <div class="label">Total Tests</div>
+      <div class="value">86</div>
+    </div>
+    <div class="card">
+      <div class="label">Failing Now</div>
+      <div class="value fail">5</div>
+    </div>
+    <div class="card">
+      <div class="label">Overall Pass Rate</div>
+      <div class="value">91.2%</div>
+    </div>
+  </div>
+
+  <div class="env-grid">
+
+    <!-- Production -->
+    <div class="env-card">
+      <div class="env-top">
+        <div class="env-name-row">
+          <span class="env-dot prod"></span>
+          <div>
+            <div class="env-name">Production</div>
+            <div class="env-url">https://acme.com</div>
+          </div>
+        </div>
+        <span class="env-tag prod">Prod</span>
+      </div>
+      <div class="env-metrics">
+        <div class="env-metric"><div class="num">24</div><div class="lbl">Tests</div></div>
+        <div class="env-metric"><div class="num pass">23</div><div class="lbl">Passing</div></div>
+        <div class="env-metric"><div class="num fail">1</div><div class="lbl">Failing</div></div>
+      </div>
+      <div class="env-footer">
+        <span class="status failed">✗ Last run failed</span>
+        <a class="env-link" href="production.html">View Dashboard →</a>
+      </div>
+    </div>
+
+    <!-- Staging -->
+    <div class="env-card">
+      <div class="env-top">
+        <div class="env-name-row">
+          <span class="env-dot staging"></span>
+          <div>
+            <div class="env-name">Staging</div>
+            <div class="env-url">https://staging.acme.com</div>
+          </div>
+        </div>
+        <span class="env-tag staging">Staging</span>
+      </div>
+      <div class="env-metrics">
+        <div class="env-metric"><div class="num">24</div><div class="lbl">Tests</div></div>
+        <div class="env-metric"><div class="num pass">21</div><div class="lbl">Passing</div></div>
+        <div class="env-metric"><div class="num fail">3</div><div class="lbl">Failing</div></div>
+      </div>
+      <div class="env-footer">
+        <span class="status failed">✗ Last run failed</span>
+        <a class="env-link" href="staging.html">View Dashboard →</a>
+      </div>
+    </div>
+
+    <!-- PR Preview -->
+    <div class="env-card">
+      <div class="env-top">
+        <div class="env-name-row">
+          <span class="env-dot preview"></span>
+          <div>
+            <div class="env-name">PR Preview #482</div>
+            <div class="env-url">https://pr-482.acme.dev</div>
+          </div>
+        </div>
+        <span class="env-tag preview">Preview</span>
+      </div>
+      <div class="env-metrics">
+        <div class="env-metric"><div class="num">18</div><div class="lbl">Tests</div></div>
+        <div class="env-metric"><div class="num pass">17</div><div class="lbl">Passing</div></div>
+        <div class="env-metric"><div class="num fail">1</div><div class="lbl">Failing</div></div>
+      </div>
+      <div class="env-footer">
+        <span class="status running">● Running</span>
+        <a class="env-link" href="preview.html">View Dashboard →</a>
+      </div>
+    </div>
+
+    <!-- Development -->
+    <div class="env-card disabled">
+      <div class="env-top">
+        <div class="env-name-row">
+          <span class="env-dot dev"></span>
+          <div>
+            <div class="env-name">Development</div>
+            <div class="env-url">http://localhost:3000</div>
+          </div>
+        </div>
+        <span class="env-tag dev">Dev</span>
+      </div>
+      <div class="env-metrics">
+        <div class="env-metric"><div class="num">20</div><div class="lbl">Tests</div></div>
+        <div class="env-metric"><div class="num pass">0</div><div class="lbl">Passing</div></div>
+        <div class="env-metric"><div class="num fail">0</div><div class="lbl">Failing</div></div>
+      </div>
+      <div class="env-footer">
+        <span class="status idle">No runs yet</span>
+        <a class="env-link" href="development.html">View Dashboard →</a>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+</body>
+</html>

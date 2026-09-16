@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BlindSpot — Production Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    background: #f4f5f7;
+    color: #1f2430;
+  }
+
+  header {
+    background: #14161f;
+    color: #fff;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  header .logo { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+  header .logo span { color: #6c8cff; }
+
+  header nav a {
+    color: #b7bcd0;
+    text-decoration: none;
+    margin-left: 24px;
+    font-size: 14px;
+  }
+  header nav a.active { color: #fff; font-weight: 600; }
+
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px;
+  }
+
+  .page-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 24px;
+  }
+
+  .page-title h1 { font-size: 22px; }
+  .page-title p { color: #6b7280; font-size: 13px; margin-top: 4px; }
+  .breadcrumb { font-size: 13px; color: #9099ac; margin-bottom: 4px; }
+  .breadcrumb a { color: #9099ac; text-decoration: none; }
+
+  .btn {
+    background: #4c6fff;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+
+  .card .label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+  .card .value { font-size: 26px; font-weight: 700; margin-top: 6px; }
+  .card .value.pass { color: #1a9e5c; }
+  .card .value.fail { color: #d63b3b; }
+
+  .panel {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .run-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid #f0f1f3;
+    font-size: 14px;
+  }
+
+  .run-row:last-child { border-bottom: none; }
+
+  .run-row .name { font-weight: 600; }
+  .run-row .meta { color: #6b7280; font-size: 12px; margin-top: 2px; }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .status.passed { background: #e6f7ee; color: #1a9e5c; }
+  .status.failed { background: #fdecec; color: #d63b3b; }
+  .status.running { background: #eef1ff; color: #4c6fff; }
+
+  .steps {
+    display: flex;
+    gap: 6px;
+    margin: 16px 20px 0;
+    flex-wrap: wrap;
+  }
+
+  .step {
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: #f4f5f7;
+    color: #4b5563;
+  }
+
+  .step.pass::before { content: "✓ "; color: #1a9e5c; }
+  .step.fail::before { content: "✗ "; color: #d63b3b; }
+
+  .failure-body { padding: 16px 20px; font-size: 13px; }
+
+  .failure-body .row { margin-bottom: 10px; }
+  .failure-body .row b { display: inline-block; width: 130px; color: #6b7280; font-weight: 600; }
+
+  .code-block {
+    background: #14161f;
+    color: #e3e5ea;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 12px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    margin-top: 4px;
+  }
+
+  .analysis {
+    background: #f7f8ff;
+    border: 1px solid #dfe3ff;
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-top: 16px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .analysis .title { font-weight: 700; color: #4c6fff; margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Blind<span>Spot</span></div>
+  <nav>
+    <a href="index.html">Environments</a>
+    <a href="#" class="active">Dashboard</a>
+    <a href="#">Tests</a>
+    <a href="#">Runs</a>
+    <a href="#">Reports</a>
+    <a href="#">Settings</a>
+  </nav>
+</header>
+
+<main>
+
+  <div class="page-title">
+    <div>
+      <div class="breadcrumb"><a href="index.html">Acme Corp</a> / Production</div>
+      <h1>Acme Corp — Production</h1>
+      <p>https://acme.com</p>
+    </div>
+    <button class="btn">Run New Test</button>
+  </div>
+
+  <div class="stats">
+    <div class="card">
+      <div class="label">Tests</div>
+      <div class="value">24</div>
+    </div>
+    <div class="card">
+      <div class="label">Passing</div>
+      <div class="value pass">23</div>
+    </div>
+    <div class="card">
+      <div class="label">Failing</div>
+      <div class="value fail">1</div>
+    </div>
+    <div class="card">
+      <div class="label">Pass Rate</div>
+      <div class="value">95.8%</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">Recent Test Runs</div>
+
+    <div class="run-row">
+      <div>
+        <div class="name">Password Reset</div>
+        <div class="meta">Ran 12 minutes ago · main @ 7c1e0a9</div>
+      </div>
+      <span class="status failed">✗ Failed</span>
+    </div>
+
+    <div class="run-row">
+      <div>
+        <div class="name">Checkout Flow</div>
+        <div class="meta">Ran 30 minutes ago · main @ 7c1e0a9</div>
+      </div>
+      <span class="status passed">✓ Passed</span>
+    </div>
+
+    <div class="run-row">
+      <div>
+        <div class="name">Authentication</div>
+        <div class="meta">Ran 1 hour ago · main @ 7c1e0a9</div>
+      </div>
+      <span class="status passed">✓ Passed</span>
+    </div>
+
+    <div class="run-row">
+      <div>
+        <div class="name">Search &amp; Filter</div>
+        <div class="meta">Ran 3 hours ago · main @ 91bf2c4</div>
+      </div>
+      <span class="status passed">✓ Passed</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">Password Reset — Failure Detail</div>
+
+    <div class="steps">
+      <span class="step pass">Request Reset Link</span>
+      <span class="step pass">Open Email</span>
+      <span class="step pass">Click Reset Link</span>
+      <span class="step fail">Submit New Password</span>
+    </div>
+
+    <div class="failure-body">
+      <div class="row"><b>Expected</b> User is redirected to login with a success message.</div>
+      <div class="row"><b>Observed</b> Form displayed "Something went wrong" and stayed on the reset page.</div>
+      <div class="row">
+        <b>Network</b>
+        <div class="code-block">POST /api/auth/reset-password → HTTP 429 (Too Many Requests)</div>
+      </div>
+      <div class="row">
+        <b>Console</b>
+        <div class="code-block">No JavaScript errors captured.</div>
+      </div>
+
+      <div class="analysis">
+        <div class="title">BlindSpot Analysis</div>
+        The reset endpoint is rate-limiting the request. This may indicate the
+        limiter's threshold is too aggressive for legitimate traffic, or a
+        prior test run against this environment left the rate limit window
+        still active.
+        <br><br>
+        <b>Suggested investigation:</b> check rate-limit configuration for
+        <code>/api/auth/reset-password</code> and confirm test traffic is
+        exempted or throttled appropriately.
+      </div>
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>
