@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BlindSpot — Audit Trail</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", Arial, sans-serif; background: #f4f5f7; color: #1f2430; }
+  header { background: #14161f; color: #fff; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; }
+  header .logo { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+  header .logo span { color: #6c8cff; }
+  header nav a { color: #b7bcd0; text-decoration: none; margin-left: 24px; font-size: 14px; }
+  header nav a.active { color: #fff; font-weight: 600; }
+  main { max-width: 900px; margin: 0 auto; padding: 32px; }
+  .breadcrumb { font-size: 13px; color: #9099ac; margin-bottom: 4px; }
+  .breadcrumb a { color: #9099ac; text-decoration: none; }
+  .page-title { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+  .page-title h1 { font-size: 22px; }
+  .run-meta { color: #6b7280; font-size: 13px; margin-bottom: 24px; }
+  .run-meta code { background: #f0f1f3; padding: 2px 6px; border-radius: 4px; font-family: "SF Mono", Consolas, monospace; }
+  .btn { background: #4c6fff; color: #fff; border: none; padding: 10px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn.secondary { background: #fff; color: #4c6fff; border: 1px solid #dfe3ff; }
+  .btn-row { display: flex; gap: 10px; }
+  .status-banner { display: flex; align-items: center; gap: 10px; background: #fdecec; border: 1px solid #f7c9c9; color: #b52d2d; font-size: 13px; font-weight: 600; padding: 12px 16px; border-radius: 8px; margin-bottom: 28px; }
+  .steps { display: flex; gap: 6px; margin-bottom: 28px; flex-wrap: wrap; }
+  .step { font-size: 12px; padding: 6px 10px; border-radius: 6px; background: #fff; border: 1px solid #e5e7eb; color: #4b5563; }
+  .step.pass::before { content: "✓ "; color: #1a9e5c; }
+  .step.fail::before { content: "✗ "; color: #d63b3b; }
+  .step.current { border-color: #f7c9c9; background: #fff5f5; }
+  .group-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .group-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .group-icon.pass { background: #1a9e5c; }
+  .group-icon.fail { background: #d63b3b; }
+  .group-title { font-size: 14px; font-weight: 700; }
+  .group-sub { font-size: 12px; color: #9099ac; margin-left: auto; }
+  .timeline { position: relative; margin: 0 0 28px 11px; padding-left: 24px; border-left: 2px solid #e5e7eb; }
+  .timeline-group.fail .timeline { border-left-color: #f3b9b9; }
+  .action-item { position: relative; padding: 10px 0 10px 8px; }
+  .action-item::before { content: ""; position: absolute; left: -29px; top: 16px; width: 9px; height: 9px; border-radius: 50%; background: #c6cad3; border: 2px solid #f4f5f7; }
+  .action-item.fail::before { background: #d63b3b; }
+  .action-item.retry::before { background: #e0a12b; }
+  .action-item.fail { background: #fff5f5; border-radius: 6px; padding: 10px 12px; margin-left: -12px; }
+  .action-item.retry { background: #fffaf0; border-radius: 6px; padding: 10px 12px; margin-left: -12px; }
+  .action-top { display: flex; align-items: baseline; gap: 10px; font-size: 13px; }
+  .ts { color: #9099ac; font-size: 11px; font-family: "SF Mono", Consolas, monospace; width: 62px; flex-shrink: 0; }
+  .badge { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.3px; flex-shrink: 0; }
+  .badge.navigate { background: #eef1ff; color: #4c6fff; }
+  .badge.fill { background: #e6f7f5; color: #128a76; }
+  .badge.click { background: #f3ecff; color: #7a3fe0; }
+  .badge.wait { background: #f0f1f3; color: #6b7280; }
+  .badge.observe { background: #f0f1f3; color: #6b7280; }
+  .badge.retry { background: #fdf3e2; color: #b9791b; }
+  .badge.network { background: #eef1ff; color: #4c6fff; }
+  .badge.fail-step { background: #fdecec; color: #d63b3b; }
+  .action-desc { font-weight: 500; }
+  .action-desc code { background: #f0f1f3; padding: 1px 5px; border-radius: 4px; font-family: "SF Mono", Consolas, monospace; font-size: 12px; }
+  .reasoning { font-size: 12px; color: #6b7280; font-style: italic; margin-top: 3px; margin-left: 72px; }
+  .result-line { font-size: 12px; color: #6b7280; margin-top: 4px; margin-left: 72px; }
+  .result-line.ok { color: #1a9e5c; }
+  .result-line.bad { color: #d63b3b; }
+  .panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 24px; overflow: hidden; }
+  .panel-header { padding: 14px 20px; border-bottom: 1px solid #e5e7eb; font-size: 14px; font-weight: 600; }
+  .failure-body { padding: 16px 20px; font-size: 13px; }
+  .failure-body .row { margin-bottom: 10px; }
+  .failure-body .row b { display: inline-block; width: 130px; color: #6b7280; font-weight: 600; }
+  .code-block { background: #14161f; color: #e3e5ea; font-family: "SF Mono", Consolas, monospace; font-size: 12px; padding: 12px 14px; border-radius: 6px; margin-top: 4px; }
+  .analysis { background: #f7f8ff; border: 1px solid #dfe3ff; border-radius: 6px; padding: 14px 16px; margin-top: 16px; font-size: 13px; line-height: 1.5; }
+  .analysis .title { font-weight: 700; color: #4c6fff; margin-bottom: 6px; }
+  .recording-label { font-size: 12px; color: #6b7280; font-weight: 600; margin: 16px 0 6px; }
+  .video-placeholder { width: 100%; max-width: 480px; height: 260px; margin: 0 auto; background: linear-gradient(135deg, #1c1f2b, #14161f); border-radius: 8px; position: relative; overflow: hidden; border: 1px solid #2a2d3a; }
+  .video-placeholder .video-tag { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.5); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; padding: 3px 7px; border-radius: 4px; text-transform: uppercase; }
+  .video-placeholder .play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; cursor: pointer; }
+  .video-placeholder .video-controls { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 12px 8px; background: linear-gradient(transparent, rgba(0,0,0,0.65)); display: flex; align-items: center; gap: 10px; }
+  .video-scrubber { flex: 1; height: 4px; background: rgba(255,255,255,0.25); border-radius: 999px; position: relative; }
+  .video-scrubber .fill { position: absolute; left: 0; top: 0; height: 100%; width: 91%; background: #4c6fff; border-radius: 999px; }
+  .video-scrubber .fail-marker { position: absolute; top: -3px; left: 91%; width: 8px; height: 8px; border-radius: 50%; background: #d63b3b; border: 2px solid #14161f; }
+  .video-time { color: #fff; font-size: 11px; font-family: "SF Mono", Consolas, monospace; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Blind<span>Spot</span></div>
+  <nav>
+    <a href="index.html">Environments</a>
+    <a href="preview.html">Dashboard</a>
+    <a href="#" class="active">Audit Trail</a>
+    <a href="#">Reports</a>
+    <a href="#">Settings</a>
+  </nav>
+</header>
+
+<main>
+
+  <div class="breadcrumb">
+    <a href="index.html">Acme Corp</a> / <a href="preview.html">PR Preview #482</a> / Authentication / Run #1187
+  </div>
+
+  <div class="page-title">
+    <div><h1>Authentication — Audit Trail</h1></div>
+    <div class="btn-row">
+      <button class="btn secondary">Download Trace</button>
+      <button class="btn secondary">Re-run Test</button>
+    </div>
+  </div>
+  <p class="run-meta">
+    Run <code>#1187</code> · started 2026-09-15 09:52:03 UTC · duration 9.0s ·
+    branch <code>feature/one-click-reorder</code> @ <code>a91f42</code>
+  </p>
+
+  <div class="status-banner">✗ Run failed at step 2 of 2 — "Log In"</div>
+
+  <div class="steps">
+    <span class="step pass">1. Open Login Page</span>
+    <span class="step fail current">2. Log In</span>
+  </div>
+
+  <div class="timeline-group pass">
+    <div class="group-header">
+      <div class="group-icon pass">✓</div>
+      <div class="group-title">1. Open Login Page</div>
+      <div class="group-sub">1 action · 0.8s</div>
+    </div>
+    <div class="timeline">
+      <div class="action-item">
+        <div class="action-top"><span class="ts">09:52:03</span><span class="badge navigate">NAVIGATE</span><span class="action-desc">to <code>/login</code></span></div>
+        <div class="result-line ok">Login form rendered with Email/Password fields — step marked complete.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="timeline-group fail">
+    <div class="group-header">
+      <div class="group-icon fail">✗</div>
+      <div class="group-title">2. Log In</div>
+      <div class="group-sub">5 actions · 8.2s</div>
+    </div>
+    <div class="timeline">
+      <div class="action-item">
+        <div class="action-top"><span class="ts">09:52:04</span><span class="badge fill">FILL</span><span class="action-desc">textbox <code>Email</code> = "test+ci@acme.dev"</span></div>
+      </div>
+      <div class="action-item">
+        <div class="action-top"><span class="ts">09:52:04</span><span class="badge fill">FILL</span><span class="action-desc">textbox <code>Password</code> = "••••••••"</span></div>
+      </div>
+      <div class="action-item">
+        <div class="action-top"><span class="ts">09:52:05</span><span class="badge click">CLICK</span><span class="action-desc">button <code>Log In</code></span></div>
+        <div class="result-line bad">No navigation occurred; button reference became stale — DOM re-rendered under the click.</div>
+      </div>
+      <div class="action-item retry">
+        <div class="action-top"><span class="ts">09:52:07</span><span class="badge retry">RECOVERY</span><span class="action-desc">re-observed page — found duplicate button <code>Log In</code> (2 matches)</span></div>
+        <div class="reasoning">Accessibility tree now reports two elements with the same role and name, likely from a newly introduced duplicate component on this branch. Retrying against the first match.</div>
+      </div>
+      <div class="action-item fail">
+        <div class="action-top"><span class="ts">09:52:11</span><span class="badge fail-step">FAIL_STEP</span><span class="action-desc">Log In marked as failed</span></div>
+        <div class="reasoning">Reasoning: "Ambiguous target — two 'Log In' buttons exist on the page after the retry. This looks like a regression introduced by the branch under test rather than a flaky selector, since the same locator succeeds on staging."</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">Failure Evidence</div>
+    <div class="failure-body">
+      <div class="row"><b>Expected</b> User is authenticated and redirected to the account dashboard.</div>
+      <div class="row"><b>Observed</b> Login form remained on screen; two "Log In" buttons found in the DOM.</div>
+      <div class="row"><b>DOM</b><div class="code-block">2 matches for role=button name="Log In" (expected 1)</div></div>
+      <div class="row"><b>Console</b><div class="code-block">Warning: duplicate key "login-cta" in rendered component tree</div></div>
+      <div class="analysis">
+        <div class="title">BlindSpot Analysis</div>
+        This branch appears to render the login CTA twice, likely from the new
+        one-click-reorder banner being mounted alongside the existing login form
+        rather than replacing a placeholder.
+        <br><br>
+        <b>Suggested investigation:</b> review the component added in
+        <code>feature/one-click-reorder</code> that touches the login page layout,
+        and confirm it isn't duplicating the existing CTA.
+      </div>
+
+      <div class="recording-label">Screen Recording (Or Screenshots)</div>
+      <div class="video-placeholder">
+        <span class="video-tag">● REC</span>
+        <div class="play-btn">▶</div>
+        <div class="video-controls">
+          <div class="video-scrubber">
+            <div class="fill"></div>
+            <div class="fail-marker" title="Failure occurs here"></div>
+          </div>
+          <span class="video-time">0:09 / 0:09</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>

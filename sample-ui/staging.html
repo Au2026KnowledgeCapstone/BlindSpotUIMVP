@@ -177,6 +177,85 @@
   }
 
   .analysis .title { font-weight: 700; color: #4c6fff; margin-bottom: 6px; }
+
+  .recording-label { font-size: 12px; color: #6b7280; font-weight: 600; margin: 16px 0 6px; }
+
+  .video-placeholder {
+    width: 100%;
+    max-width: 480px;
+    height: 260px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #1c1f2b, #14161f);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #2a2d3a;
+  }
+  .video-placeholder .video-tag {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .video-placeholder .play-btn {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .video-placeholder .video-controls {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 22px 12px 8px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.65));
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .video-scrubber {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 999px;
+    position: relative;
+  }
+  .video-scrubber .fill {
+    position: absolute;
+    left: 0; top: 0; height: 100%;
+    width: 68%;
+    background: #4c6fff;
+    border-radius: 999px;
+  }
+  .video-scrubber .fail-marker {
+    position: absolute;
+    top: -3px;
+    left: 68%;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #d63b3b;
+    border: 2px solid #14161f;
+  }
+  .video-time {
+    color: #fff;
+    font-size: 11px;
+    font-family: "SF Mono", Consolas, monospace;
+    flex-shrink: 0;
+  }
 </style>
 </head>
 <body>
@@ -260,7 +339,10 @@
   </div>
 
   <div class="panel">
-    <div class="panel-header">Checkout Flow — Failure Detail</div>
+    <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+      <span>Checkout Flow — Failure Detail</span>
+      <a href="audit-checkout.html" style="font-size:12px; color:#4c6fff; text-decoration:none; font-weight:600;">View Audit Trail →</a>
+    </div>
 
     <div class="steps">
       <span class="step pass">Create Account</span>
@@ -290,6 +372,19 @@
         <b>Suggested investigation:</b> inspect <code>POST /api/orders</code>,
         review <code>payment_method_id</code> handling, and check backend logs
         for the failing request.
+      </div>
+
+      <div class="recording-label">Screen Recording</div>
+      <div class="video-placeholder">
+        <span class="video-tag">● REC</span>
+        <div class="play-btn">▶</div>
+        <div class="video-controls">
+          <div class="video-scrubber">
+            <div class="fill"></div>
+            <div class="fail-marker" title="Failure occurs here"></div>
+          </div>
+          <span class="video-time">0:10 / 0:15</span>
+        </div>
       </div>
     </div>
   </div>
